@@ -7,6 +7,7 @@
 # Install Packages
     go get go.mongodb.org/mongo-driver
     go get github.com/xuri/excelize/v2
+    go get github.com/sirupsen/logrus
 
 # Run Code
     go mod tidy
