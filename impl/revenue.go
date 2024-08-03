@@ -1,7 +1,6 @@
 package impl
 
 import (
-	"log"
 	"orderDetails/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -70,7 +69,7 @@ func GetRevenue(reqBody model.Request) (interface{}, error) {
 	}
 	resp, err := ExecuteQuery(query)
 	if err != nil {
-		log.Println("Error in Executing query ::: ", err)
+		model.Log.Error("Error in Executing query ::: ", err)
 		return map[string]interface{}{"success": false, "error": err}, err
 	}
 	response := make(map[string]interface{})

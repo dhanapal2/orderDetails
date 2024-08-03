@@ -2,7 +2,6 @@ package impl
 
 import (
 	"context"
-	"log"
 	"orderDetails/model"
 	"regexp"
 	"sync"
@@ -20,18 +19,18 @@ func DbConnect() error {
 	clientOptions := options.Client().ApplyURI(MongoURL)
 	MongoDB.Client, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Println("Please check the Mongo url ")
+		model.Log.Error("Please check the Mongo url ")
 		return err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err = MongoDB.Client.Ping(ctx, nil)
 	if err != nil {
-		log.Println("Mongodb is not connecting. Please check the connection ...")
+		model.Log.Error("Mongodb is not connecting. Please check the connection ...")
 		return err
 	}
 
-	log.Println("Connected to MongoDB!")
+	model.Log.Debug("Connected to MongoDB!")
 
 	MongoDB.Database = MongoDB.Client.Database("Lumel")
 	MongoDB.Collection = MongoDB.Database.Collection("orders")
@@ -61,13 +60,13 @@ func InsertMany(docs []interface{}, wg *sync.WaitGroup, response *model.Result) 
 func ExecuteQuery(query mongo.Pipeline) ([]bson.M, error) {
 	cursor, err := MongoDB.Collection.Aggregate(context.TODO(), query)
 	if err != nil {
-		log.Println("Error in exeting query")
+		model.Log.Error("Error in exeting query")
 		return nil, err
 	}
 
 	var results []bson.M
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		log.Println("Error in formting query Result ::: " + err.Error())
+		model.Log.Error("Error in formting query Result ::: " + err.Error())
 		return nil, err
 	}
 

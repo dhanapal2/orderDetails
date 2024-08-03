@@ -1,7 +1,6 @@
 package impl
 
 import (
-	"log"
 	"orderDetails/model"
 	"sync"
 
@@ -13,21 +12,21 @@ func ReadCSV() error {
 	var finalResult model.Result
 	file, err := excelize.OpenFile("order_details.xlsx")
 	if err != nil {
-		log.Println("Error in opening file " + err.Error())
+		model.Log.Error("Error in opening file " + err.Error())
 		return err
 	}
 	defer file.Close()
 
 	rows, err := file.GetRows("Sheet1")
 	if err != nil {
-		log.Println("Sheet not found in excel")
+		model.Log.Error("Sheet not found in excel")
 		return err
 	}
-	log.Println("Readed xlsx successfully ...")
+	model.Log.Error("Readed xlsx successfully ...")
 	doc := make([]interface{}, 0)
 	for _, row := range rows[1:] {
 		if len(row) < 14 {
-			log.Println("Incomplete row")
+			model.Log.Error("Incomplete row")
 		}
 		doc = append(doc, map[string]interface{}{
 			"_id":           row[0],
@@ -58,7 +57,7 @@ func ReadCSV() error {
 		go InsertMany(doc, &wg, &finalResult)
 	}
 	wg.Wait()
-	log.Println("Total Duplicate ID ::: ", len(finalResult.DuplicatedKey), "List of IDs ::: ", finalResult.DuplicatedKey)
-	log.Println("Total Inserted ID ::: ", len(finalResult.InsertedKey), "List of IDs ::: ", finalResult.InsertedKey)
+	model.Log.Debug("Total Duplicate ID ::: ", len(finalResult.DuplicatedKey), "List of IDs ::: ", finalResult.DuplicatedKey)
+	model.Log.Debug("Total Inserted ID ::: ", len(finalResult.InsertedKey), "List of IDs ::: ", finalResult.InsertedKey)
 	return nil
 }
